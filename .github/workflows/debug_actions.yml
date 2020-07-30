@@ -1,0 +1,13 @@
+name: Debug
+
+on: workflow_dispatch
+
+jobs:
+  debug:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: Display Python state
+      run: |
+        ls -al /bin/python*
+        ls -al /bin
+        

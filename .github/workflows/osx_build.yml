@@ -1,0 +1,97 @@
+name: MacOS Builds
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number, used for the release name'
+        default: ''
+        required: true
+
+defaults:
+  run:
+    shell: bash
+    
+jobs:
+  create_macos_builds:
+    name: Create MacOS Builds
+    runs-on: macos-latest
+
+    steps:
+    - name: Clone Godot
+      uses: actions/checkout@v2
+      with:
+        repository: godotengine/godot
+        ref: 3.2
+        path: godot
+    
+    - name: Clone GLTF module
+      uses: actions/checkout@v2
+      with:
+        repository: godot-extended-libraries/gltf
+        ref: master
+        path: godot/modules/gltf
+
+    - name: Set up Python 3.x
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+        architecture: 'x64'
+
+    - name: Configuring Python packages
+      run: |
+        python -c "import sys; print(sys.version)"
+        python -m pip install scons
+        python --version
+        scons --version
+        
+    - name: Compile Engine and Templates
+      run: |
+        cd godot
+        scons -j2 platform=osx target=release_debug debug_symbols=no
+        scons -j2 platform=osx tools=no target=release debug_symbols=no bits=64
+        scons -j2 platform=osx tools=no target=debug debug_symbols=no bits=64
+    
+    - name: Create a Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          tag_name: ${{ github.ref }}
+          release_name: OSX builds ${{ github.event.inputs.version }}
+          body: ''
+          draft: true
+          prerelease: true
+
+    - name: Upload OSX build
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: godot/bin/godot.osx.opt.tools.64
+        asset_name: godot.osx.tools.64
+        asset_content_type: application/octet-stream
+    
+    - name: Upload OSX Debug Template
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: godot/bin/godot.osx.debug.64
+        asset_name: template.osx.debug
+        asset_content_type: application/octet-stream
+    
+    - name: Upload OSX Release Template
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: godot/bin/godot.osx.opt.64
+        asset_name: template.osx.release
+        asset_content_type: application/octet-stream
+
+        

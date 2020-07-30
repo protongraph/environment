@@ -1,0 +1,108 @@
+name: Linux Builds
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number, used for the release name'
+        default: ''
+        required: true
+
+jobs:
+  create_linux_builds:
+    name: Create Linux Builds
+    runs-on: ubuntu-16.04
+
+    steps:
+    - name: Clone Godot
+      uses: actions/checkout@v2
+      with:
+        repository: godotengine/godot
+        ref: 3.2
+        path: godot
+    
+    - name: Clone GLTF module
+      uses: actions/checkout@v2
+      with:
+        repository: godot-extended-libraries/gltf
+        ref: master
+        path: godot/modules/gltf
+    
+      # Azure repositories are not reliable, we need to prevent azure giving us packages.
+    - name: Make apt sources.list use the default Ubuntu repositories
+      run: |
+        sudo cp -f godot/misc/ci/sources.list /etc/apt/sources.list
+        sudo apt-get update
+          
+    - name: Install dependencies
+      run: |
+        sudo apt-get install build-essential pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev yasm
+
+    - name: Set up Python 3.x
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+        architecture: 'x64'
+
+    - name: Configuring Python packages
+      run: |
+        python -c "import sys; print(sys.version)"
+        python -m pip install scons
+        python --version
+        scons --version
+
+    - name: Compile Engine and Templates
+      run: |
+        cd godot
+        scons -j2 platform=x11
+        strip bin/godot.x11.tools.64
+        
+        scons -j2 platform=x11 tools=no target=release bits=64
+        mv bin/godot.x11.opt.64 bin/template.x11.release
+        strip bin/template.x11.release
+        
+        scons -j2 platform=x11 tools=no target=debug bits=64
+        mv bin/godot.x11.debug.64 bin/template.x11.debug
+        strip bin/template.x11.debug
+    
+    - name: Create a Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          tag_name: ${{ github.ref }}
+          release_name: Linux builds ${{ github.event.inputs.version }}
+          body: ''
+          draft: true
+          prerelease: true
+
+    - name: Upload Linux build
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: godot/bin/godot.x11.tools.64
+        asset_name: godot.x11.tools.64
+        asset_content_type: application/octet-stream
+    
+    - name: Upload Linux Debug Template
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: godot/bin/template.x11.debug
+        asset_name: template.x11.debug
+        asset_content_type: application/octet-stream
+    
+    - name: Upload Linux Release Template
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: godot/bin/template.x11.release
+        asset_name: template.x11.release
+        asset_content_type: application/octet-stream
