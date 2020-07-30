@@ -1,0 +1,82 @@
+name: Linux Builds
+
+on: workflow_dispatch
+
+jobs:
+  create_linux_builds:
+    name: Create Linux Builds
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Clone Godot
+      uses: actions/checkout@v2
+      with:
+        repository: godotengine/godot
+        ref: 3.2
+        path: godot
+    
+    - name: Clone GLTF module
+      uses: actions/checkout@v2
+      with:
+        repository: godot-extended-libraries/gltf
+        path: godot/modules/gltf
+    
+    - name: Clone current repository
+      uses: actions/checkout@v2
+      with:
+        repository: HungryProton/concept_graph_environment
+        path: env
+
+      # Azure repositories are not reliable, we need to prevent azure giving us packages.
+    - name: Make apt sources.list use the default Ubuntu repositories
+      run: |
+        sudo cp -f godot/misc/ci/sources.list /etc/apt/sources.list
+        sudo apt-get update
+          
+    - name: Install dependencies
+      run: |
+        sudo apt-get install build-essential pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev yasm
+
+    - name: Set up Python 3.x
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+        architecture: 'x64'
+
+    - name: Configuring Python packages
+      run: |
+        python -c "import sys; print(sys.version)"
+        python -m pip install scons
+        python --version
+        scons --version
+
+    - name: Compile Engine and Templates
+      run: |
+        cd godot
+        scons -j2 platform=x11
+        strip bin/godot.x11.tools.64
+        
+        scons -j2 platform=x11 tools=no target=release bits=64
+        mv bin/godot.x11.opt.64 bin/template.x11.release
+        strip bin/template.x11.release
+        
+        scons -j2 platform=x11 tools=no target=debug bits=64
+        mv bin/godot.x11.debug.64 bin/template.x11.debug
+        strip bin/template.x11.debug
+    
+    - name: Save binaries
+      run: |
+        mkdir -p env/linux
+        cp godot/bin/godot.x11.tools.64 env/linux
+        cp godot/bin/template.x11.release env/linux
+        cp godot/bin/template.x11.debug env/linux
+    
+    - name: Commit and Push
+      uses: EndBug/add-and-commit@v4
+      with:
+        add: linux
+        cwd: env
+        message: Linux builds from Github Actions
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
