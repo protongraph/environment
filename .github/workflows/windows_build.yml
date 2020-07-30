@@ -1,0 +1,74 @@
+name: Windows Builds
+
+on: workflow_dispatch
+
+defaults:
+  run:
+    shell: bash
+    
+jobs:
+  create_windows_builds:
+    name: Create Windows Builds
+    runs-on: windows-latest
+
+    steps:
+    - name: Clone Godot
+      uses: actions/checkout@v2
+      with:
+        repository: godotengine/godot
+        ref: 3.2
+        path: godot
+    
+    - name: Clone GLTF module
+      uses: actions/checkout@v2
+      with:
+        repository: godot-extended-libraries/gltf
+        path: godot/modules/gltf
+    
+    - name: Clone current repository
+      uses: actions/checkout@v2
+      with:
+        repository: HungryProton/concept_graph_environment
+        path: env
+
+    - name: Set up Python 3.x
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+        architecture: 'x64'
+
+    - name: Configuring Python packages
+      run: |
+        python -c "import sys; print(sys.version)"
+        python -m pip install scons pywin32
+        python --version
+        scons --version
+        
+    - name: Compile Engine and Templates
+      run: |
+        cd godot
+        scons -j2 platform=windows target=release_debug debug_symbols=no
+        
+        scons -j2 platform=x11 tools=no target=release debug_symbols=no bits=64
+        mv bin/godot.windows.opt.64.exe bin/template.windows.release.exe
+        
+        scons -j2 platform=x11 tools=no target=debug debug_symbols=no bits=64
+        mv bin/godot.windows.debug.64 bin/template.windows.debug.exe
+    
+    - name: Save binaries
+      run: |
+        rm -rf env/windows
+        mkdir env/windows
+        cp godot/bin/godot.windows.tools.64.exe env/windows
+        cp godot/bin/template.windows.release.exe env/windows
+        cp godot/bin/template.windows.debug.exe env/windows
+    
+    - name: Commit and Push
+      uses: EndBug/add-and-commit@v4
+      with:
+        add: windows
+        cwd: env
+        message: Windows builds from Github Actions
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
