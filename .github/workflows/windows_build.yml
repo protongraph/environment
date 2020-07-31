@@ -49,10 +49,10 @@ jobs:
         cd godot
         scons -j2 platform=windows target=release_debug debug_symbols=no
         
-        scons -j2 platform=x11 tools=no target=release debug_symbols=no bits=64
+        scons -j2 platform=windows tools=no target=release debug_symbols=no bits=64
         mv bin/godot.windows.opt.64.exe bin/template.windows.release.exe
         
-        scons -j2 platform=x11 tools=no target=debug debug_symbols=no bits=64
+        scons -j2 platform=windows tools=no target=debug debug_symbols=no bits=64
         mv bin/godot.windows.debug.64 bin/template.windows.debug.exe
     
     - name: Save binaries
