@@ -10,13 +10,11 @@ that handle gltf import and export. This means the export templates need to be r
 
 ## Automated builds
 
-**WORK IN PROGRESS**
-
 The goal of this repository is to compile the custom engine and all the templates automatically for all three platforms (Linux, Windows and MacOS).
-This is done through Github Actions and the artifacts should be stored somewhere in here. Once this is done at least once, the ConceptGraph
-repository can fetch these binaries and use them to export the project.
- 
- 
+This is done through Github Actions and the binaries are then stored in their own folder. The ConceptGraph CI can fetch these binaries and use 
+them to export the project to all three platforms. If you're developping new features for ConceptGraph and can't build the engine, you can download the binaries directly from here.
+
+
 ## Building manually
 
 ### Install dependencies
@@ -36,7 +34,6 @@ https://docs.godotengine.org/en/stable/development/compiling/index.html
 ```
 git clone https://github.com/HungryProton/concept_graph
 ```
-
 
 + Clone the engine repository and make sure you're on the **3.2 branch**
 ```
@@ -59,11 +56,16 @@ git clone https://github.com/godot-extended-libraries/gltf
 scons -j8 platform=x11
 ```
 
++ **Note about binaries size:**
+  - Everytime you compile something with scons, you can chose to omit the debug symbols
+with the option `debug_symbols=no`. This creates significantly smaller binaries, at the expense
+of having a completely useless stack trace if something crashes.
+
 ### Compile the export templates
 
 + Still in the godot folder, launch the following commands
   - Replace `x11` by your desired platform `x11 | windows | osx`
-  - Replace `bits=64` by `bits=32` if you're target an older 32bit hardware.
+  - Replace `bits=64` by `bits=32` if you're targetting an older 32bit hardware.
 
 ```
 scons platform=x11 tools=no target=release_debug bits=64
@@ -90,7 +92,16 @@ scons platform=linux bits=64
 ### Export the project
 
 #### Using the command line
- **TODO**
++ Make sure the export preset contains the path to the export templates, relative to the project directory.
++ Call this command with the proper parameters:
+  - `godot.x11.tools.64` is the editor binary. Replace with the one matching your platform.
+  - `-export "linux"` linux is the name of the preset. Pick one among `linux`, `osx` and `windows`. They're defined in `export_preset.cfg`.
+  - `ConceptGraph` is the name of the binary.
+  - The project is exported in the `../release` folder by default. If it can't be reached, the binary and pck file will be created at the root of the project.
+```
+./godot.tools.64 --path path/to/project --export "linux" ConceptGraph
+```
+
 
 #### Using the GUI
 
