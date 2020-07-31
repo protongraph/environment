@@ -81,7 +81,7 @@ cd godot-cpp
 git submodule update --init godot_headers
 
 # edit the following command to use the proper platform
-scons platform=linux generate_bindins=yes -j8 bits=64
+scons platform=linux generate_bindings=yes -j8 bits=64
 
 cd ../
 
