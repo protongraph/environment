@@ -59,7 +59,7 @@ jobs:
       run: |
         rm -rf env/windows
         mkdir env/windows
-        cp godot/bin/godot.windows.tools.64.exe env/windows
+        cp godot/bin/godot.windows.opt.tools.64.exe env/windows
         cp godot/bin/template.windows.release.exe env/windows
         cp godot/bin/template.windows.debug.exe env/windows
     
