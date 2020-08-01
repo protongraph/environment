@@ -57,16 +57,18 @@ jobs:
     
     - name: Save binaries
       run: |
-        rm -rf env/osx
-        mkdir env/osx
+        mkdir -p env/osx/osx_template.app/Contents/MacOS
+        rm -rf env/osx/osx.zip
         cp godot/bin/godot.osx.opt.tools.64 env/osx
-        cp godot/bin/template.osx.release env/osx
-        cp godot/bin/template.osx.debug env/osx
+        cp godot/bin/godot.osx.opt.64 env/osx/osx_template.app/Contents/MacOS/godot_osx_release.64
+        cp godot/bin/godot.osx.debug.64 env/osx/osx_template.app/Contents/MacOS/godot_osx_debug.64
+        cd env/osx
+        zip -r osx.zip osx_template.app
     
     - name: Commit and Push
       uses: EndBug/add-and-commit@v4
       with:
-        add: osx
+        add: osx/osx.zip
         cwd: env
         message: MacOS builds from Github Actions
       env:

@@ -32,7 +32,7 @@ https://docs.godotengine.org/en/stable/development/compiling/index.html
     + develop is the bleeding edge, untested version
 
 ```
-git clone https://github.com/HungryProton/concept_graph
+git clone --recurse-submodules -b standalone https://github.com/HungryProton/concept_graph
 ```
 
 + Clone the engine repository and make sure you're on the **3.2 branch**
@@ -76,17 +76,9 @@ scons platform=x11 tools=no target=release bits=64
 + In ConceptGraph repository folder
 ``` bash
 cd src/native
-git submodule update --init godot-cpp
-cd godot-cpp
-git submodule update --init godot_headers
 
 # edit the following command to use the proper platform
-scons platform=linux generate_bindings=yes -j8 bits=64
-
-cd ../
-
-# Same here
-scons platform=linux bits=64
+./compile_all.sh linux
 ```
 
 ### Export the project
@@ -96,10 +88,9 @@ scons platform=linux bits=64
 + Call this command with the proper parameters:
   - `godot.x11.tools.64` is the editor binary. Replace with the one matching your platform.
   - `-export "linux"` linux is the name of the preset. Pick one among `linux`, `osx` and `windows`. They're defined in `export_preset.cfg`.
-  - `ConceptGraph` is the name of the binary.
-  - The project is exported in the `../release` folder by default. If it can't be reached, the binary and pck file will be created at the root of the project.
+  - `build/ConceptGraph` is the name of the exported binary. Make sure the destination folder exists before running the command.
 ```
-./godot.tools.64 --path path/to/project --export "linux" ConceptGraph
+./godot.tools.64 --path path/to/project --export "linux" "build/ConceptGraph"
 ```
 
 
