@@ -59,6 +59,9 @@ jobs:
       run: |
         mkdir -p env/osx/osx_template.app/Contents/MacOS
         rm -rf env/osx/osx.zip
+        
+        ls -al godot/bin
+        
         cp godot/bin/godot.osx.opt.tools.64 env/osx
         cp godot/bin/godot.osx.opt.64 env/osx/osx_template.app/Contents/MacOS/godot_osx_release.64
         cp godot/bin/godot.osx.debug.64 env/osx/osx_template.app/Contents/MacOS/godot_osx_debug.64
