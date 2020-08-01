@@ -48,20 +48,13 @@ jobs:
       run: |
         cd godot
         scons -j2 platform=osx target=release_debug debug_symbols=no
-        
         scons -j2 platform=osx tools=no target=release debug_symbols=no bits=64
-        mv bin/godot.osx.opt.64 bin/template.osx.release
-        
         scons -j2 platform=osx tools=no target=debug debug_symbols=no bits=64
-        mv bin/godot.osx.debug.64 bin/template.osx.debug
     
     - name: Save binaries
       run: |
         mkdir -p env/osx/osx_template.app/Contents/MacOS
         rm -rf env/osx/osx.zip
-        
-        ls -al godot/bin
-        
         cp godot/bin/godot.osx.opt.tools.64 env/osx
         cp godot/bin/godot.osx.opt.64 env/osx/osx_template.app/Contents/MacOS/godot_osx_release.64
         cp godot/bin/godot.osx.debug.64 env/osx/osx_template.app/Contents/MacOS/godot_osx_debug.64
