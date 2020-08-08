@@ -32,7 +32,7 @@ https://docs.godotengine.org/en/stable/development/compiling/index.html
     + develop is the bleeding edge, untested version
 
 ```
-git clone --recurse-submodules -b standalone https://github.com/HungryProton/concept_graph
+git clone --recurse-submodules https://github.com/HungryProton/concept_graph
 ```
 
 + Clone the engine repository and make sure you're on the **3.2 branch**
