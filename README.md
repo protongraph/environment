@@ -26,10 +26,8 @@ https://docs.godotengine.org/en/stable/development/compiling/index.html
 ### Get all the repositories
 
 + Clone ConceptGraph
-  - For now: **you need to use the standalone branch**
-  - In the future:
-    + The master branch is usually the latest stable release
-    + develop is the bleeding edge, untested version
+  - The master branch is usually the latest stable release
+  - develop is the bleeding edge, untested version
 
 ```
 git clone --recurse-submodules https://github.com/HungryProton/concept_graph
