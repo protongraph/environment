@@ -1,6 +1,12 @@
 name: Windows Builds
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number, used for the release name'
+        default: ''
+        required: true
 
 defaults:
   run:
@@ -91,5 +97,3 @@ jobs:
         asset_path: godot/bin/template.windows.release
         asset_name: template.windows.release
         asset_content_type: application/octet-stream
-
-        
