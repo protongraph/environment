@@ -25,6 +25,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: godot-extended-libraries/gltf
+        ref: master
         path: godot/modules/gltf
     
       # Azure repositories are not reliable, we need to prevent azure giving us packages.
