@@ -70,7 +70,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: godot/bin/godot.osx.tools.64
+        asset_path: godot/bin/godot.osx.opt.tools.64
         asset_name: godot.osx.tools.64
         asset_content_type: application/octet-stream
     
@@ -80,7 +80,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: godot/bin/template.osx.debug
+        asset_path: godot/bin/godot.osx.debug.64
         asset_name: template.osx.debug
         asset_content_type: application/octet-stream
     
@@ -90,7 +90,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: godot/bin/template.osx.release
+        asset_path: godot/bin/godot.osx.opt.64
         asset_name: template.osx.release
         asset_content_type: application/octet-stream
 
