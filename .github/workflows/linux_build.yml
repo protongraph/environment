@@ -1,6 +1,12 @@
 name: Linux Builds
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number, used for the release name'
+        default: ''
+        required: true
 
 jobs:
   create_linux_builds:
@@ -71,12 +77,44 @@ jobs:
         cp godot/bin/template.x11.release env/linux
         cp godot/bin/template.x11.debug env/linux
     
-    - name: Commit and Push
-      uses: EndBug/add-and-commit@v4
+    - name: Create a Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        add: linux
-        cwd: env
-        message: Linux builds from Github Actions
+          tag_name: ${{ github.ref }}
+          release_name: Linux builds ${{ github.event.inputs.version }}
+          body: ''
+          draft: true
+          prerelease: true
+
+    - name: Upload Linux build
+      uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: godot/bin/godot.x11.tools.64
+        asset_name: godot.x11.tools.64
+        asset_content_type: application/octet-stream
+    
+    - name: Upload Linux Debug Template
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: godot/bin/template.x11.debug
+        asset_name: template.x11.debug
+        asset_content_type: application/octet-stream
+    
+    - name: Upload Linux Release Template
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: godot/bin/template.x11.release
+        asset_name: template.x11.release
+        asset_content_type: application/octet-stream
