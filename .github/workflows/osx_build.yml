@@ -1,13 +1,19 @@
 name: MacOS Builds
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number, used for the release name'
+        default: ''
+        required: true
 
 defaults:
   run:
     shell: bash
     
 jobs:
-  create_windows_builds:
+  create_macos_builds:
     name: Create MacOS Builds
     runs-on: macos-latest
 
