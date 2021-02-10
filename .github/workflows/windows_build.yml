@@ -23,14 +23,9 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: godot-extended-libraries/gltf
+        ref: master
         path: godot/modules/gltf
     
-    - name: Clone current repository
-      uses: actions/checkout@v2
-      with:
-        repository: HungryProton/concept_graph_environment
-        path: env
-
     - name: Set up Python 3.x
       uses: actions/setup-python@v2
       with:
@@ -55,20 +50,46 @@ jobs:
         scons -j2 platform=windows tools=no target=debug debug_symbols=no bits=64
         mv bin/godot.windows.debug.64 bin/template.windows.debug.exe
     
-    - name: Save binaries
-      run: |
-        rm -rf env/windows
-        mkdir env/windows
-        cp godot/bin/godot.windows.opt.tools.64.exe env/windows
-        cp godot/bin/template.windows.release.exe env/windows
-        cp godot/bin/template.windows.debug.exe env/windows
-    
-    - name: Commit and Push
-      uses: EndBug/add-and-commit@v4
+    - name: Create a Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        add: windows
-        cwd: env
-        message: Windows builds from Github Actions
+          tag_name: ${{ github.ref }}
+          release_name: Windows builds ${{ github.event.inputs.version }}
+          body: ''
+          draft: true
+          prerelease: true
+
+    - name: Upload Windows build
+      uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: godot/bin/godot.windows.tools.64
+        asset_name: godot.windows.tools.64
+        asset_content_type: application/octet-stream
+    
+    - name: Upload Windows Debug Template
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: godot/bin/template.windows.debug
+        asset_name: template.windows.debug
+        asset_content_type: application/octet-stream
+    
+    - name: Upload Windows Release Template
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: godot/bin/template.windows.release
+        asset_name: template.windows.release
+        asset_content_type: application/octet-stream
+
         
