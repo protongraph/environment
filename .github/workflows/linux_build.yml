@@ -27,12 +27,6 @@ jobs:
         repository: godot-extended-libraries/gltf
         path: godot/modules/gltf
     
-    - name: Clone current repository
-      uses: actions/checkout@v2
-      with:
-        repository: HungryProton/concept_graph_environment
-        path: env
-
       # Azure repositories are not reliable, we need to prevent azure giving us packages.
     - name: Make apt sources.list use the default Ubuntu repositories
       run: |
@@ -69,13 +63,6 @@ jobs:
         scons -j2 platform=x11 tools=no target=debug bits=64
         mv bin/godot.x11.debug.64 bin/template.x11.debug
         strip bin/template.x11.debug
-    
-    - name: Save binaries
-      run: |
-        mkdir -p env/linux
-        cp godot/bin/godot.x11.tools.64 env/linux
-        cp godot/bin/template.x11.release env/linux
-        cp godot/bin/template.x11.debug env/linux
     
     - name: Create a Release
       id: create_release
