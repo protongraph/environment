@@ -11,7 +11,7 @@ on:
 jobs:
   create_linux_builds:
     name: Create Linux Headless Build
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-16.04
 
     steps:
     - name: Clone Godot
@@ -37,7 +37,6 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get install build-essential pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev yasm
-
     - name: Set up Python 3.x
       uses: actions/setup-python@v2
       with:
